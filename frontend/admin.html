@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html ng-app="raceApp">
+<head>
+    <title>DeadlineDrift - Admin</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+</head>
+
+<body ng-controller="adminCtrl">
+
+<h2>🚗 DeadlineDrift - Admin Dashboard</h2>
+
+<form ng-submit="addParticipant()">
+
+    <label>Name:</label><br>
+    <input type="text" ng-model="participant.name" required><br><br>
+
+    <label>Distance Covered (meters):</label><br>
+    <input type="number" ng-model="participant.distance" required><br><br>
+
+    <label>Time Taken (seconds):</label><br>
+    <input type="number" ng-model="participant.time"><br><br>
+
+    <label>Finished:</label>
+    <input type="checkbox" ng-model="participant.finished"><br><br>
+
+    <button type="submit">Add Record</button>
+
+</form>
+
+<p>{{message}}</p>
+
+<script src="app.js"></script>
+</body>
+</html>
