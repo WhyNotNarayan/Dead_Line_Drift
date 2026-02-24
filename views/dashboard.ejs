@@ -35,9 +35,18 @@
     tr:nth-child(even) { background: #1a1a1a; }
     tr:hover { background: #222; }
     .rank { font-weight: bold; width: 80px; }
-    .rank-1 { color: gold; }
-    .rank-2 { color: silver; }
-    .rank-3 { color: #cd7f32; }
+    .rank-1 { 
+      color: gold;           /* #FFD700 */
+      font-weight: bold;
+    }
+    .rank-2 { 
+      color: rgb(192, 192, 192);         /* #C0C0C0 */
+      font-weight: bold;
+    }
+    .rank-3 { 
+      color: #cd7f32;        /* bronze */
+      font-weight: bold;
+    }
     .time { font-family: monospace; font-size: 1.1em; }
     .finished { color: #00ff88; font-weight: bold; }
     .ongoing-section { margin-top: 60px; }
@@ -45,24 +54,6 @@
     .link-admin { text-align: center; margin-top: 40px; font-size: 0.95em; }
     .link-admin a { color: #00ff88; text-decoration: none; }
     .link-admin a:hover { text-decoration: underline; }
-
-    .rank-1 { 
-  color: gold;           /* #FFD700 */
-  font-weight: bold;
-}
-.rank-2 { 
-  color: rgb(192, 192, 192);         /* #C0C0C0 */
-  font-weight: bold;
-}
-.rank-3 { 
-  color: #cd7f32;        /* bronze */
-  font-weight: bold;
-}
-.rank {
-  font-weight: bold;
-  width: 80px;
-  text-align: center;
-}
   </style>
 </head>
 <body>
@@ -75,6 +66,7 @@
       <table>
         <thead>
           <tr>
+            <th>Rank</th>
             <th>Name</th>
             <th>Time</th>
             <th>Email</th>
@@ -83,7 +75,20 @@
         <tbody>
           <% finishedPlayers.forEach(player => { %>
             <tr>
-              <td><strong><%= player.name %></strong></td>
+              <td class="rank 
+                <%= player.rank === 1 ? 'rank-1' : '' %>
+                <%= player.rank === 2 ? 'rank-2' : '' %>
+                <%= player.rank === 3 ? 'rank-3' : '' %>
+              ">
+                #<%= player.rank %>
+              </td>
+              <td class="
+                <%= player.rank === 1 ? 'rank-1' : '' %>
+                <%= player.rank === 2 ? 'rank-2' : '' %>
+                <%= player.rank === 3 ? 'rank-3' : '' %>
+              ">
+                <strong><%= player.name %></strong>
+              </td>
               <td class="time"><%= player.formattedTime %></td>
               <td><%= player.email %></td>
             </tr>
@@ -102,19 +107,33 @@
         <table>
           <thead>
             <tr>
+              <th>Rank</th>
               <th>Name</th>
               <th>Distance</th>
               <th>Time So Far</th>
-              <th>Email / Phone</th>
+              <th>Email</th>
             </tr>
           </thead>
           <tbody>
             <% ongoingPlayers.forEach(player => { %>
               <tr>
-                <td><strong><%= player.name %></strong></td>
+                <td class="rank 
+                  <%= player.rank === 1 ? 'rank-1' : '' %>
+                  <%= player.rank === 2 ? 'rank-2' : '' %>
+                  <%= player.rank === 3 ? 'rank-3' : '' %>
+                ">
+                  #<%= player.rank %>
+                </td>
+                <td class="
+                  <%= player.rank === 1 ? 'rank-1' : '' %>
+                  <%= player.rank === 2 ? 'rank-2' : '' %>
+                  <%= player.rank === 3 ? 'rank-3' : '' %>
+                ">
+                  <strong><%= player.name %></strong>
+                </td>
                 <td><strong><%= player.distance %> m</strong></td>
                 <td class="time"><%= player.formattedTime %></td>
-                <td><%= player.email %> • <%= player.phone %></td>
+                <td><%= player.email %></td>
               </tr>
             <% }) %>
           </tbody>
