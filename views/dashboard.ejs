@@ -71,72 +71,56 @@
     <p class="subtitle">College Car Racing Event - Live Leaderboard</p>
 
     <% if (finishedPlayers.length > 0) { %>
-        <h2>🏆 Finished - Final Rankings</h2>
+      <h2>🏆 Finished Players</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Time</th>
+            <th>Email</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% finishedPlayers.forEach(player => { %>
+            <tr>
+              <td><strong><%= player.name %></strong></td>
+              <td class="time"><%= player.formattedTime %></td>
+              <td><%= player.email %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    <% } else { %>
+      <p style="text-align:center; color:#888; margin:30px 0;">
+        No one has finished the race yet...
+      </p>
+    <% } %>
+
+    <% if (ongoingPlayers.length > 0) { %>
+      <div class="ongoing-section">
+        <h2>Still Racing - Current Progress</h2>
         <table>
           <thead>
             <tr>
-              <th>Rank</th>
               <th>Name</th>
-              <th>Time</th>
+              <th>Distance</th>
+              <th>Time So Far</th>
               <th>Email / Phone</th>
             </tr>
           </thead>
           <tbody>
-            <% finishedPlayers.forEach(player => { %>
+            <% ongoingPlayers.forEach(player => { %>
               <tr>
-                <td class="rank 
-                  <%= player.rank === 1 ? 'rank-1' : '' %>
-                  <%= player.rank === 2 ? 'rank-2' : '' %>
-                  <%= player.rank === 3 ? 'rank-3' : '' %>
-                ">
-                  #<%= player.rank %>
-                </td>
-                <td class="
-                  <%= player.rank === 1 ? 'rank-1' : '' %>
-                  <%= player.rank === 2 ? 'rank-2' : '' %>
-                  <%= player.rank === 3 ? 'rank-3' : '' %>
-                ">
-                  <strong><%= player.name %></strong>
-                </td>
+                <td><strong><%= player.name %></strong></td>
+                <td><strong><%= player.distance %> m</strong></td>
                 <td class="time"><%= player.formattedTime %></td>
                 <td><%= player.email %> • <%= player.phone %></td>
               </tr>
             <% }) %>
           </tbody>
         </table>
-      <% } else { %>
-        <p style="text-align:center; color:#888;">No one has finished the race yet...</p>
-      <% } %>
-
-    <% if (ongoingPlayers.length > 0) { %>
-        <div class="ongoing-section">
-          <h2>Still Racing - Current Progress (Ranked by Distance & Speed)</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Rank</th>
-                <th>Name</th>
-                <th>Distance</th>
-                <th>Time So Far</th>
-                <th>Email</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% ongoingPlayers.forEach(player => { %>
-                <tr>
-                  <td class="rank <%= player.rank <= 3 ? 'rank-' + player.rank : '' %>">
-                    #<%= player.rank %>
-                  </td>
-                  <td><strong><%= player.name %></strong></td>
-                  <td><strong><%= player.distance %> m</strong></td>
-                  <td class="time"><%= player.formattedTime %></td>
-                  <td><%= player.email %> • <%= player.phone %></td>
-                </tr>
-              <% }) %>
-            </tbody>
-          </table>
-        </div>
-      <% } %>
+      </div>
+    <% } %>
 
     <div class="link-admin">
       <a href="/login">Admin Panel (Organizers Only)</a>
