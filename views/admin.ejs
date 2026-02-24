@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DeadLine Drift - Admin Panel</title>
+  <style>
+    body { 
+      background:#0f0f0f; 
+      color:#fff; 
+      font-family:'Segoe UI',sans-serif; 
+      margin:0; 
+      padding:20px; 
+    }
+    .header { 
+      display:flex; 
+      justify-content:space-between; 
+      align-items:center; 
+      background:#1a1a1a; 
+      padding:15px 30px; 
+      border-radius:12px; 
+      margin-bottom:20px; 
+    }
+    h1 { margin:0; color:#0f0; }
+    table { 
+      width:100%; 
+      border-collapse:collapse; 
+      background:#1a1a1a; 
+      border-radius:12px; 
+      overflow:hidden; 
+    }
+    th, td { 
+      padding:12px; 
+      text-align:left; 
+      border-bottom:1px solid #333; 
+    }
+    th { background:#0a0a0a; }
+    tr:hover { background:#222; }
+    .form-container { 
+      background:#1a1a1a; 
+      padding:25px; 
+      border-radius:12px; 
+      margin-bottom:30px; 
+    }
+    input, select, button { 
+      padding:10px; 
+      margin:8px 0; 
+      border-radius:6px; 
+    }
+    input, select { 
+      background:#222; 
+      border:1px solid #0f0; 
+      color:#fff; 
+      width:calc(100% - 22px); 
+    }
+    button { 
+      background:#0f0; 
+      color:#000; 
+      font-weight:bold; 
+      cursor:pointer; 
+      width:100%; 
+      border:none; 
+    }
+    .success { color:#0f0; font-weight:bold; margin:10px 0; }
+    .error   { color:#ff4444; font-weight:bold; margin:10px 0; }
+    .finished { color:#0f0; font-weight:bold; }
+    label { display:block; margin:10px 0; font-size:0.95em; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>🏁 DeadLine Drift - Admin Panel</h1>
+    <div>
+      <a href="/dashboard" style="color:#0f0; margin-right:20px; text-decoration:none;">View Live Leaderboard</a>
+      <a href="/logout" style="color:#ff4444; text-decoration:none;">Logout</a>
+    </div>
+  </div>
+
+  <% if (success) { %>
+    <p class="success"><%= success %></p>
+  <% } %>
+  <% if (error) { %>
+    <p class="error"><%= error %></p>
+  <% } %>
+
+  <div class="form-container">
+    <h2>Add New Rider / Player</h2>
+    <form method="POST" action="/admin/add-rider" id="riderForm">
+      <input type="text" name="riderId" placeholder="Rider ID (e.g. 101)" required>
+      <input type="text" name="name" placeholder="Player Name" required>
+      <input type="email" name="email" placeholder="Email Address" required>
+      <input type="tel" name="phone" placeholder="Phone Number" required>
+      
+      <label>Time (MM:SS):</label>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <select name="minute" required>
+          <% for(let i=0; i<60; i++) { %>
+            <option value="<%= i %>"><%= i.toString().padStart(2,'0') %></option>
+          <% } %>
+        </select>
+        <span style="font-size:1.4em; color:#0f0;">:</span>
+        <select name="second" required>
+          <% for(let i=0; i<60; i++) { %>
+            <option value="<%= i %>"><%= i.toString().padStart(2,'0') %></option>
+          <% } %>
+        </select>
+      </div>
+
+      <input type="number" name="distance" id="distanceInput" placeholder="Distance (meters)" min="1">
+      
+      <label>
+        <input type="checkbox" name="finish" id="finishCheck"> 
+        Mark as Finished (distance will be ignored / must be empty)
+      </label>
+
+      <button type="submit">Add Player</button>
+    </form>
+  </div>
+
+  <h2>All Players / Riders</h2>
+
+  <% if (riders && riders.length > 0) { %>
+    <table>
+      <thead>
+        <tr>
+          <th>Rider ID</th>
+          <th>Name</th>
+          <th>Time</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% riders.forEach(r => { %>
+          <tr>
+            <td><strong><%= r.riderId || '???' %></strong></td>
+            <td><%= r.name || '(no name)' %></td>
+            <td>
+              <strong>
+                <%= (typeof r.minute === 'number' ? r.minute.toString().padStart(2, '0') : '--') %>:
+                <%= (typeof r.second === 'number' ? r.second.toString().padStart(2, '0') : '--') %>
+              </strong>
+            </td>
+            <td>
+              <% if (r.finish === true) { %>
+                <span class="finished">✅ Finished</span>
+              <% } else { %>
+                Distance: <%= (typeof r.distance === 'number' ? r.distance + ' m' : '---') %>
+              <% } %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } else { %>
+    <p style="text-align:center; color:#888; margin-top:30px;">
+      No players added yet. Add your first player above!
+    </p>
+  <% } %>
+
+  <script>
+    const finishCheck = document.getElementById('finishCheck');
+    const distanceInput = document.getElementById('distanceInput');
+
+    function updateDistanceField() {
+      if (finishCheck.checked) {
+        distanceInput.value = '';
+        distanceInput.disabled = true;
+        distanceInput.required = false;
+      } else {
+        distanceInput.disabled = false;
+        distanceInput.required = true;
+      }
+    }
+
+    // Run on page load + on change
+    updateDistanceField();
+    finishCheck.addEventListener('change', updateDistanceField);
+  </script>
+
+</body>
+</html>

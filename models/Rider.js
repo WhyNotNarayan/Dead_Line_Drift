@@ -1,0 +1,22 @@
+const mongoose = require('mongoose');
+
+const riderSchema = new mongoose.Schema({
+  riderId: { type: String, required: true, unique: true },
+  name: { type: String, required: true },
+  email: { type: String, required: true },
+  phone: { type: String, required: true },
+  minute: { type: Number, required: true, min: 0, max: 59 },
+  second: { type: Number, required: true, min: 0, max: 59 },
+  distance: { type: Number },
+  finish: { type: Boolean, default: false }
+});
+
+// models/Rider.js  (add this at the end, before module.exports)
+riderSchema.virtual('totalSeconds').get(function() {
+    return (this.minute * 60) + this.second;
+  });
+  
+  riderSchema.set('toJSON', { virtuals: true });
+  riderSchema.set('toObject', { virtuals: true });
+
+module.exports = mongoose.model('Rider', riderSchema);

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DeadLine Drift - College Car Race Leaderboard</title>
+  <style>
+    body {
+      background: #0a0a0a;
+      color: #e0e0e0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    .container { max-width: 1000px; margin: 0 auto; }
+    h1 { color: #00ff88; text-align: center; margin-bottom: 10px; }
+    .subtitle { text-align: center; color: #888; margin-bottom: 40px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #111;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,255,136,0.15);
+    }
+    th, td { padding: 14px 16px; text-align: left; }
+    th {
+      background: #00cc66;
+      color: #000;
+      font-weight: bold;
+      text-transform: uppercase;
+      font-size: 0.9em;
+    }
+    tr:nth-child(even) { background: #1a1a1a; }
+    tr:hover { background: #222; }
+    .rank { font-weight: bold; width: 80px; }
+    .rank-1 { color: gold; }
+    .rank-2 { color: silver; }
+    .rank-3 { color: #cd7f32; }
+    .time { font-family: monospace; font-size: 1.1em; }
+    .finished { color: #00ff88; font-weight: bold; }
+    .ongoing-section { margin-top: 60px; }
+    .ongoing-section h2 { color: #ffaa00; text-align: center; }
+    .link-admin { text-align: center; margin-top: 40px; font-size: 0.95em; }
+    .link-admin a { color: #00ff88; text-decoration: none; }
+    .link-admin a:hover { text-decoration: underline; }
+
+    .rank-1 { 
+  color: gold;           /* #FFD700 */
+  font-weight: bold;
+}
+.rank-2 { 
+  color: rgb(192, 192, 192);         /* #C0C0C0 */
+  font-weight: bold;
+}
+.rank-3 { 
+  color: #cd7f32;        /* bronze */
+  font-weight: bold;
+}
+.rank {
+  font-weight: bold;
+  width: 80px;
+  text-align: center;
+}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🏎️ DeadLine Drift</h1>
+    <p class="subtitle">College Car Racing Event - Live Leaderboard</p>
+
+    <% if (finishedPlayers.length > 0) { %>
+        <h2>🏆 Finished - Final Rankings</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Name</th>
+              <th>Time</th>
+              <th>Email / Phone</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% finishedPlayers.forEach(player => { %>
+              <tr>
+                <td class="rank 
+                  <%= player.rank === 1 ? 'rank-1' : '' %>
+                  <%= player.rank === 2 ? 'rank-2' : '' %>
+                  <%= player.rank === 3 ? 'rank-3' : '' %>
+                ">
+                  #<%= player.rank %>
+                </td>
+                <td class="
+                  <%= player.rank === 1 ? 'rank-1' : '' %>
+                  <%= player.rank === 2 ? 'rank-2' : '' %>
+                  <%= player.rank === 3 ? 'rank-3' : '' %>
+                ">
+                  <strong><%= player.name %></strong>
+                </td>
+                <td class="time"><%= player.formattedTime %></td>
+                <td><%= player.email %> • <%= player.phone %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      <% } else { %>
+        <p style="text-align:center; color:#888;">No one has finished the race yet...</p>
+      <% } %>
+
+    <% if (ongoingPlayers.length > 0) { %>
+        <div class="ongoing-section">
+          <h2>Still Racing - Current Progress (Ranked by Distance & Speed)</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Distance</th>
+                <th>Time So Far</th>
+                <th>Email / Phone</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% ongoingPlayers.forEach(player => { %>
+                <tr>
+                  <td class="rank <%= player.rank <= 3 ? 'rank-' + player.rank : '' %>">
+                    #<%= player.rank %>
+                  </td>
+                  <td><strong><%= player.name %></strong></td>
+                  <td><strong><%= player.distance %> m</strong></td>
+                  <td class="time"><%= player.formattedTime %></td>
+                  <td><%= player.email %> • <%= player.phone %></td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+
+    <div class="link-admin">
+      <a href="/login">Admin Panel (Organizers Only)</a>
+    </div>
+  </div>
+</body>
+</html>
