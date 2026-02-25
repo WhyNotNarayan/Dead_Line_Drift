@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const riderSchema = new mongoose.Schema({
   riderId: { type: String, required: true, unique: true },
   name: { type: String, required: true },
-  email: { type: String, required: true },
   phone: { type: String, required: true },
   minute: { type: Number, required: true, min: 0, max: 59 },
   second: { type: Number, required: true, min: 0, max: 59 },
