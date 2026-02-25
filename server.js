@@ -203,6 +203,23 @@ app.post('/admin/add-rider', isAuthenticated, async (req, res) => {
   }
 });
 
+// ===== AUTO-PING TO KEEP RENDER FREE INSTANCE AWAKE =====
+// Only run in production (Render environment)
+if (process.env.NODE_ENV === 'production' || process.env.RENDER) {
+  const https = require('https');
+  const MY_URL = 'https://dead-line-drift.onrender.com/dashboard';  // ← change to your exact Render URL
+
+  console.log(`[AUTO-PING] Starting self-ping every 5 minutes to ${MY_URL}`);
+
+  setInterval(() => {
+    https.get(MY_URL, (res) => {
+      console.log(`[AUTO-PING] ${new Date().toISOString()} → Status: ${res.statusCode}`);
+    }).on('error', (err) => {
+      console.error(`[AUTO-PING] Error: ${err.message}`);
+    });
+  }, 5 * 60 * 1000);  // 5 minutes = 300000 ms
+}
+
 // Logout
 app.get('/logout', (req, res) => {
   req.session.destroy(() => {
