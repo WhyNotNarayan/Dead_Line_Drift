@@ -7,7 +7,17 @@ const riderSchema = new mongoose.Schema({
   minute: { type: Number, required: true, min: 0, max: 59 },
   second: { type: Number, required: true, min: 0, max: 59 },
   distance: { type: Number },
-  finish: { type: Boolean, default: false }
+  finish: { type: Boolean, default: false },
+
+  // Email ko optional bana do aur unique index hata do
+  email: { 
+    type: String, 
+    required: false,          // ← not required
+    unique: false,            // ← no unique constraint
+    sparse: true,             // ← allow multiple nulls
+    trim: true,
+    lowercase: true
+  }
 });
 
 // models/Rider.js  (add this at the end, before module.exports)

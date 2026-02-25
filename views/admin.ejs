@@ -46,25 +46,25 @@
       padding:10px; 
       margin:8px 0; 
       border-radius:6px; 
+      width:calc(100% - 22px); 
     }
     input, select { 
       background:#222; 
       border:1px solid #0f0; 
       color:#fff; 
-      width:calc(100% - 22px); 
     }
     button { 
       background:#0f0; 
       color:#000; 
       font-weight:bold; 
       cursor:pointer; 
-      width:100%; 
       border:none; 
     }
     .success { color:#0f0; font-weight:bold; margin:10px 0; }
-    .error   { color:#ff4444; font-weight:bold; margin:10px 0; }
+    .error   { color:#ff4444; font-weight:bold; margin:5px 0; font-size:0.9em; }
     .finished { color:#0f0; font-weight:bold; }
     label { display:block; margin:10px 0; font-size:0.95em; }
+    .form-group { position: relative; }
   </style>
 </head>
 <body>
@@ -87,9 +87,17 @@
   <div class="form-container">
     <h2>Add New Rider / Player</h2>
     <form method="POST" action="/admin/add-rider" id="riderForm">
-      <input type="text" name="riderId" placeholder="Rider ID (e.g. 101)" required>
+      <div class="form-group">
+        <input type="text" name="riderId" id="riderIdInput" placeholder="Rider ID (e.g. 101)" required>
+        <div id="riderIdError" class="error" style="display:none;"></div>
+      </div>
+
       <input type="text" name="name" placeholder="Player Name" required>
-      <input type="tel" name="phone" placeholder="Phone Number" required>
+
+      <div class="form-group">
+        <input type="tel" name="phone" id="phoneInput" placeholder="Phone Number (exactly 10 digits)" required pattern="[0-9]{10}">
+        <div id="phoneError" class="error" style="display:none;">Phone number must be exactly 10 digits.</div>
+      </div>
       
       <label>Time (MM:SS):</label>
       <div style="display:flex; gap:10px; align-items:center;">
@@ -125,6 +133,7 @@
         <tr>
           <th>Rider ID</th>
           <th>Name</th>
+          <th>Phone</th>
           <th>Time</th>
           <th>Status</th>
         </tr>
@@ -134,6 +143,7 @@
           <tr>
             <td><strong><%= r.riderId || '???' %></strong></td>
             <td><%= r.name || '(no name)' %></td>
+            <td><%= r.phone || '—' %></td>
             <td>
               <strong>
                 <%= (typeof r.minute === 'number' ? r.minute.toString().padStart(2, '0') : '--') %>:
@@ -160,7 +170,13 @@
   <script>
     const finishCheck = document.getElementById('finishCheck');
     const distanceInput = document.getElementById('distanceInput');
-
+    const phoneInput = document.getElementById('phoneInput');
+    const phoneError = document.getElementById('phoneError');
+    const riderIdInput = document.getElementById('riderIdInput');
+    const riderIdError = document.getElementById('riderIdError');
+    const form = document.getElementById('riderForm');
+  
+    // Distance logic
     function updateDistanceField() {
       if (finishCheck.checked) {
         distanceInput.value = '';
@@ -171,10 +187,93 @@
         distanceInput.required = true;
       }
     }
-
-    // Run on page load + on change
     updateDistanceField();
     finishCheck.addEventListener('change', updateDistanceField);
+  
+    // Phone: limit to 10 digits + disable after 10
+    phoneInput.addEventListener('input', function(e) {
+      let value = this.value.replace(/\D/g, '');
+      if (value.length > 10) value = value.slice(0, 10);
+      this.value = value;
+  
+      if (value.length === 10) {
+        phoneError.style.display = 'none';
+        this.disabled = true;
+        this.style.background = '#222';
+      } else {
+        this.disabled = false;
+        if (value.length > 0 && value.length < 10) {
+          phoneError.style.display = 'block';
+          phoneError.textContent = 'Phone number must be exactly 10 digits.';
+        } else {
+          phoneError.style.display = 'none';
+        }
+      }
+    });
+  
+    // Re-enable on backspace/delete if disabled
+    phoneInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Backspace' || e.key === 'Delete') {
+        if (this.disabled) {
+          this.disabled = false;
+          phoneError.style.display = 'none';
+        }
+      }
+    });
+  
+    // Rider ID check (unchanged)
+    let checkTimeout;
+    riderIdInput.addEventListener('input', function() {
+      clearTimeout(checkTimeout);
+      const riderId = this.value.trim();
+      riderIdError.style.display = 'none';
+      if (riderId === '') return;
+  
+      checkTimeout = setTimeout(() => {
+        fetch('/admin/check-rider-id', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ riderId })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.exists) {
+            riderIdError.textContent = 'ID already exists. Please use another ID.';
+            riderIdError.style.display = 'block';
+          }
+        })
+        .catch(err => console.error(err));
+      }, 500);
+    });
+  
+    // Form submit - critical fix for disabled phone
+    form.addEventListener('submit', function(e) {
+      // IMPORTANT: Re-enable phone so value is sent
+      const wasDisabled = phoneInput.disabled;
+      phoneInput.disabled = false;
+  
+      const phoneValue = phoneInput.value.trim();
+  
+      if (phoneValue.length !== 10 || !/^\d{10}$/.test(phoneValue)) {
+        e.preventDefault();
+        phoneError.style.display = 'block';
+        phoneInput.focus();
+        // Re-disable after failed attempt
+        if (wasDisabled && phoneValue.length === 10) {
+          setTimeout(() => { phoneInput.disabled = true; }, 100);
+        }
+        return;
+      }
+  
+      // Rider ID check
+      if (riderIdError.style.display !== 'none') {
+        e.preventDefault();
+        riderIdInput.focus();
+        return;
+      }
+  
+      // If everything is ok → form submits normally
+    });
   </script>
 
 </body>

@@ -172,17 +172,25 @@ app.post('/admin/add-rider', isAuthenticated, async (req, res) => {
     if (await Rider.findOne({ riderId })) {
       throw new Error('Rider ID already exists');
     }
+// Add this right after const { riderId, name, email, phone, ... } = req.body;
 
-    const newRider = new Rider({
-      riderId,
-      name,
-      email,
-      phone,
-      minute: minVal,
-      second: secVal,
-      distance: finalDistance,
-      finish: isFinished
-    });
+const cleanedPhone = (phone || '').trim();
+
+if (!cleanedPhone || !/^\d{10}$/.test(cleanedPhone)) {
+  throw new Error('Phone number is required and must be exactly 10 digits');
+}
+
+// Then use cleanedPhone when saving
+const newRider = new Rider({
+  riderId,
+  name,
+  email,
+  phone: cleanedPhone,   // ← use this
+  minute: minVal,
+  second: secVal,
+  distance: finalDistance,
+  finish: isFinished
+});
 
     await newRider.save();
 
@@ -200,6 +208,18 @@ app.post('/admin/add-rider', isAuthenticated, async (req, res) => {
       success: null,
       error: err.message || 'Failed to add rider'
     });
+  }
+});
+
+// Check if Rider ID already exists (for AJAX validation)
+app.post('/admin/check-rider-id', isAuthenticated, async (req, res) => {
+  const { riderId } = req.body;
+  try {
+    const existing = await Rider.findOne({ riderId });
+    res.json({ exists: !!existing });
+  } catch (err) {
+    console.error('Check rider ID error:', err);
+    res.status(500).json({ error: 'Server error' });
   }
 });
 

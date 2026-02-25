@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>DeadLine Drift - College Car Race Leaderboard</title>
   <style>
     body {
@@ -10,50 +10,180 @@
       color: #e0e0e0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
-      padding: 20px;
-      line-height: 1.6;
+      padding: 12px;
+      line-height: 1.5;
+      font-size: 16px; /* base size */
     }
-    .container { max-width: 1000px; margin: 0 auto; }
-    h1 { color: #00ff88; text-align: center; margin-bottom: 10px; }
-    .subtitle { text-align: center; color: #888; margin-bottom: 40px; }
+
+    .container {
+      max-width: 100%;
+      margin: 0 auto;
+    }
+
+    h1 {
+      color: #00ff88;
+      text-align: center;
+      margin: 15px 0 5px;
+      font-size: clamp(1.6rem, 5.5vw, 2.4rem);
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #888;
+      margin-bottom: 15px;
+      font-size: clamp(0.95rem, 3.8vw, 1.1rem);
+    }
+
+    .search-container {
+      margin: 15px 0 25px;
+      text-align: center;
+    }
+
+    #searchInput {
+      width: 100%;
+      max-width: 450px;
+      padding: 10px 14px;
+      font-size: 1em;
+      background: #1a1a1a;
+      border: 2px solid #00cc66;
+      border-radius: 8px;
+      color: #e0e0e0;
+      outline: none;
+    }
+
+    #searchInput:focus {
+      border-color: #00ff88;
+    }
+
+    h2 {
+      color: #00ff88;
+      text-align: center;
+      margin: 30px 0 10px;
+      font-size: clamp(1.3rem, 4.8vw, 1.6rem);
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+      margin-bottom: 25px;
+      -webkit-overflow-scrolling: touch;
+    }
+
     table {
       width: 100%;
+      min-width: 0; /* allow shrinking */
       border-collapse: collapse;
       background: #111;
-      border-radius: 12px;
+      border-radius: 10px;
       overflow: hidden;
-      box-shadow: 0 4px 20px rgba(0,255,136,0.15);
+      box-shadow: 0 3px 15px rgba(0,255,136,0.1);
     }
-    th, td { padding: 14px 16px; text-align: left; }
+
+    th, td {
+      padding: 10px 8px;
+      text-align: left;
+      border-bottom: 1px solid #222;
+      white-space: nowrap; /* prevent wrapping */
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
     th {
       background: #00cc66;
       color: #000;
       font-weight: bold;
       text-transform: uppercase;
-      font-size: 0.9em;
+      font-size: 0.82em;
     }
+
     tr:nth-child(even) { background: #1a1a1a; }
     tr:hover { background: #222; }
-    .rank { font-weight: bold; width: 80px; }
-    .rank-1 { 
-      color: gold;           /* #FFD700 */
+
+    .rank {
+      font-weight: bold;
+      width: 50px;
+      text-align: center;
+      font-size: 0.9em;
+    }
+
+    .rank-1 { color: gold; }
+    .rank-2 { color: silver; }
+    .rank-3 { color: #cd7f32; }
+
+    .name {
+      font-weight: bold;
+      min-width: 120px;
+      max-width: 180px;
+    }
+
+    .rider-id {
+      font-family: monospace;
+      color: #bbb;
+      font-size: 0.88em;
+      min-width: 70px;
+      max-width: 100px;
+    }
+
+    .time {
+      font-family: monospace;
+      color: #00ff88;
+      font-size: 0.95em;
+      min-width: 70px;
+    }
+
+    .status-finished {
+      color: #00ff88;
+      font-weight: bold;
+      font-size: 0.92em;
+      min-width: 90px;
+    }
+
+    .distance {
+      color: #ffaa00;
+      font-weight: bold;
+      min-width: 80px;
+    }
+
+    .ongoing-section { margin-top: 40px; }
+    .ongoing-section h2 { color: #ff0000; }
+
+    .link-admin {
+      text-align: center;
+      margin: 40px 0 15px;
+      font-size: 1em;
+    }
+
+    .link-admin a {
+      color: #00ff88;
+      text-decoration: none;
       font-weight: bold;
     }
-    .rank-2 { 
-      color: rgb(192, 192, 192);         /* #C0C0C0 */
-      font-weight: bold;
-    }
-    .rank-3 { 
-      color: #cd7f32;        /* bronze */
-      font-weight: bold;
-    }
-    .time { font-family: monospace; font-size: 1.1em; }
-    .finished { color: #00ff88; font-weight: bold; }
-    .ongoing-section { margin-top: 60px; }
-    .ongoing-section h2 { color: #ffaa00; text-align: center; }
-    .link-admin { text-align: center; margin-top: 40px; font-size: 0.95em; }
-    .link-admin a { color: #00ff88; text-decoration: none; }
+
     .link-admin a:hover { text-decoration: underline; }
+
+    .no-results {
+      text-align: center;
+      color: #ff4444;
+      font-size: 1.1em;
+      margin: 30px 0;
+      display: none;
+    }
+
+    /* Small screen adjustments - keep table format, just shrink */
+    @media (max-width: 768px) {
+      body { font-size: 14px; padding: 10px; }
+      th, td { padding: 8px 6px; font-size: 0.85em; }
+      .rank { width: 40px; font-size: 0.8em; }
+      .name { min-width: 100px; max-width: 140px; font-size: 0.9em; }
+      .rider-id { min-width: 60px; font-size: 0.8em; }
+      .time, .distance, .status-finished { min-width: 60px; font-size: 0.85em; }
+      #searchInput { font-size: 0.95em; padding: 9px 12px; }
+    }
+
+    @media (max-width: 480px) {
+      th, td { padding: 7px 5px; font-size: 0.8em; }
+      .name { max-width: 110px; }
+      .rider-id, .time, .status-finished { font-size: 0.78em; }
+    }
   </style>
 </head>
 <body>
@@ -61,42 +191,45 @@
     <h1>🏎️ DeadLine Drift</h1>
     <p class="subtitle">College Car Racing Event - Live Leaderboard</p>
 
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Search by Name or Rider ID...">
+    </div>
+
+    <div id="noResultsFinished" class="no-results">No matching players found in Finished list.</div>
+    <div id="noResultsOngoing" class="no-results">No matching players found in Still Racing list.</div>
+
     <% if (finishedPlayers.length > 0) { %>
       <h2>🏆 Finished Players</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Rank</th>
-            <th>Name</th>
-            <th>Time</th>
-            <th>Email</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% finishedPlayers.forEach(player => { %>
+      <div class="table-wrapper">
+        <table id="finishedTable">
+          <thead>
             <tr>
-              <td class="rank 
-                <%= player.rank === 1 ? 'rank-1' : '' %>
-                <%= player.rank === 2 ? 'rank-2' : '' %>
-                <%= player.rank === 3 ? 'rank-3' : '' %>
-              ">
-                #<%= player.rank %>
-              </td>
-              <td class="
-                <%= player.rank === 1 ? 'rank-1' : '' %>
-                <%= player.rank === 2 ? 'rank-2' : '' %>
-                <%= player.rank === 3 ? 'rank-3' : '' %>
-              ">
-                <strong><%= player.name %></strong>
-              </td>
-              <td class="time"><%= player.formattedTime %></td>
-              <td><%= player.email %></td>
+              <th>Rank</th>
+              <th>Name</th>
+              <th>Rider ID</th>
+              <th>Time</th>
+              <th>Status</th>
             </tr>
-          <% }) %>
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            <% finishedPlayers.forEach(player => { %>
+              <tr data-name="<%= player.name.toLowerCase() %>" data-id="<%= (player.riderId || '').toLowerCase() %>">
+                <td class="rank <%= player.rank === 1 ? 'rank-1' : '' %> <%= player.rank === 2 ? 'rank-2' : '' %> <%= player.rank === 3 ? 'rank-3' : '' %>">
+                  #<%= player.rank %>
+                </td>
+                <td class="name <%= player.rank === 1 ? 'rank-1' : '' %> <%= player.rank === 2 ? 'rank-2' : '' %> <%= player.rank === 3 ? 'rank-3' : '' %>">
+                  <%= player.name %>
+                </td>
+                <td class="rider-id"><%= player.riderId || '—' %></td>
+                <td class="time"><%= player.formattedTime %></td>
+                <td class="status-finished">✅ Finished</td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
     <% } else { %>
-      <p style="text-align:center; color:#888; margin:30px 0;">
+      <p style="text-align:center; color:#888; margin:40px 0; font-size:1.1em;">
         No one has finished the race yet...
       </p>
     <% } %>
@@ -104,40 +237,34 @@
     <% if (ongoingPlayers.length > 0) { %>
       <div class="ongoing-section">
         <h2>Still Racing - Current Progress</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Rank</th>
-              <th>Name</th>
-              <th>Distance</th>
-              <th>Time So Far</th>
-              <th>Email</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% ongoingPlayers.forEach(player => { %>
+        <div class="table-wrapper">
+          <table id="ongoingTable">
+            <thead>
               <tr>
-                <td class="rank 
-                  <%= player.rank === 1 ? 'rank-1' : '' %>
-                  <%= player.rank === 2 ? 'rank-2' : '' %>
-                  <%= player.rank === 3 ? 'rank-3' : '' %>
-                ">
-                  #<%= player.rank %>
-                </td>
-                <td class="
-                  <%= player.rank === 1 ? 'rank-1' : '' %>
-                  <%= player.rank === 2 ? 'rank-2' : '' %>
-                  <%= player.rank === 3 ? 'rank-3' : '' %>
-                ">
-                  <strong><%= player.name %></strong>
-                </td>
-                <td><strong><%= player.distance %> m</strong></td>
-                <td class="time"><%= player.formattedTime %></td>
-                <td><%= player.email %></td>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Rider ID</th>
+                <th>Distance</th>
+                <th>Time So Far</th>
               </tr>
-            <% }) %>
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              <% ongoingPlayers.forEach(player => { %>
+                <tr data-name="<%= player.name.toLowerCase() %>" data-id="<%= (player.riderId || '').toLowerCase() %>">
+                  <td class="rank <%= player.rank === 1 ? 'rank-1' : '' %> <%= player.rank === 2 ? 'rank-2' : '' %> <%= player.rank === 3 ? 'rank-3' : '' %>">
+                    #<%= player.rank %>
+                  </td>
+                  <td class="name <%= player.rank === 1 ? 'rank-1' : '' %> <%= player.rank === 2 ? 'rank-2' : '' %> <%= player.rank === 3 ? 'rank-3' : '' %>">
+                    <%= player.name %>
+                  </td>
+                  <td class="rider-id"><%= player.riderId || '—' %></td>
+                  <td class="distance"><%= player.distance %> m</td>
+                  <td class="time"><%= player.formattedTime %></td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
       </div>
     <% } %>
 
@@ -145,5 +272,37 @@
       <a href="/login">Admin Panel (Organizers Only)</a>
     </div>
   </div>
+
+  <!-- Search script (same as before) -->
+  <script>
+    const searchInput = document.getElementById('searchInput');
+    const noResultsFinished = document.getElementById('noResultsFinished');
+    const noResultsOngoing = document.getElementById('noResultsOngoing');
+
+    function checkNoResults(tableId, noResultsEl) {
+      const visibleRows = document.querySelectorAll(`#${tableId} tbody tr:not([style*="display: none"])`);
+      noResultsEl.style.display = (visibleRows.length === 0 && searchInput.value.trim() !== '') ? 'block' : 'none';
+    }
+
+    searchInput.addEventListener('input', function() {
+      const filter = this.value.toLowerCase().trim();
+
+      const finishedRows = document.querySelectorAll('#finishedTable tbody tr');
+      finishedRows.forEach(row => {
+        const name = row.getAttribute('data-name') || '';
+        const id = row.getAttribute('data-id') || '';
+        row.style.display = (name.includes(filter) || id.includes(filter)) ? '' : 'none';
+      });
+      checkNoResults('finishedTable', noResultsFinished);
+
+      const ongoingRows = document.querySelectorAll('#ongoingTable tbody tr');
+      ongoingRows.forEach(row => {
+        const name = row.getAttribute('data-name') || '';
+        const id = row.getAttribute('data-id') || '';
+        row.style.display = (name.includes(filter) || id.includes(filter)) ? '' : 'none';
+      });
+      checkNoResults('ongoingTable', noResultsOngoing);
+    });
+  </script>
 </body>
 </html>
